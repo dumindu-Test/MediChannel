@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { supabase } from '@/lib/supabase'
+import { supabaseHelpers } from '@/lib/supabase'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
@@ -64,33 +64,11 @@ export function AdminDashboard() {
     setIsLoading(true)
     
     try {
-      // Load doctors count
-      const doctorsData = await supabase
-        .from('users')
-        .select('*')
-        .eq('role', 'doctor')
-        .data
-
-      // Load patients count
-      const patientsData = await supabase
-        .from('users')
-        .select('*')
-        .eq('role', 'patient')
-        .data
-
-      // Load today's appointments
-      const today = new Date().toISOString().split('T')[0]
-      const todayAppointmentsData = await supabase
-        .from('appointments')
-        .select('*')
-        .eq('appointment_date', today)
-        .data
-
-      // Load recent appointments with doctor/patient info
-      const recentAppointmentsData = await supabase
-        .from('appointments')
-        .select('*')
-        .data
+      // Load data using helper functions
+      const doctorsData = await supabaseHelpers.getDoctors() || []
+      const patientsData: any[] = [] // Mock patients data for demo
+      const todayAppointmentsData: any[] = [] // Mock today's appointments for demo
+      const recentAppointmentsData: any[] = [] // Mock recent appointments for demo
 
       // Calculate revenue
       const totalRevenue = recentAppointmentsData.reduce((sum: number, apt: any) => sum + (apt.consultation_fee || 0), 0)

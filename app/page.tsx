@@ -3,12 +3,16 @@
 import { useState } from 'react'
 import { AuthProvider, useAuth } from '@/lib/auth-context'
 import { LoginForm } from '@/components/login-form'
+import { SignupForm } from '@/components/signup-form'
 import { Sidebar } from '@/components/sidebar'
 import { DoctorSearch } from '@/components/patient/doctor-search'
 import { AppointmentBooking } from '@/components/patient/appointment-booking'
 import { AppointmentHistory } from '@/components/patient/appointment-history'
 import { DoctorSchedule } from '@/components/doctor/doctor-schedule'
 import { AdminDashboard } from '@/components/admin/admin-dashboard'
+import { SupabaseSetupScreen } from '@/components/supabase-setup-screen'
+import { DemoModeBanner } from '@/components/demo-mode-banner'
+import { isSupabaseConfigured } from '@/lib/supabase'
 
 function Dashboard() {
   const { user } = useAuth()
@@ -177,6 +181,7 @@ function Dashboard() {
     <div className="flex h-screen bg-background">
       <Sidebar activeTab={activeTab} onTabChange={setActiveTab} />
       <main className="flex-1 overflow-auto p-6">
+        <DemoModeBanner />
         {renderContent()}
       </main>
     </div>
@@ -184,6 +189,11 @@ function Dashboard() {
 }
 
 export default function Home() {
+  // Show setup screen if Supabase is not configured
+  if (!isSupabaseConfigured) {
+    return <SupabaseSetupScreen />
+  }
+
   return (
     <AuthProvider>
       <AppContent />
@@ -193,11 +203,15 @@ export default function Home() {
 
 function AppContent() {
   const { user } = useAuth()
+  const [showSignup, setShowSignup] = useState(false)
 
   console.log('App content rendered, user:', user)
 
   if (!user) {
-    return <LoginForm />
+    if (showSignup) {
+      return <SignupForm onBackToLogin={() => setShowSignup(false)} />
+    }
+    return <LoginForm onSwitchToSignup={() => setShowSignup(true)} />
   }
 
   return <Dashboard />

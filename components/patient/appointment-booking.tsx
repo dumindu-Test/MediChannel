@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { supabase } from '@/lib/supabase'
+import { supabaseHelpers } from '@/lib/supabase'
 import { useAuth } from '@/lib/auth-context'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -58,12 +58,7 @@ export function AppointmentBooking({ doctorId, onBack, onBookingComplete }: Appo
     setIsLoading(true)
     
     try {
-      const doctorData = await supabase
-        .from('users')
-        .select('*')
-        .eq('id', doctorId)
-        .eq('role', 'doctor')
-        .single()
+      const doctorData = await supabaseHelpers.getUserById(doctorId)
 
       if (doctorData) {
         const doctorInfo: Doctor = {
@@ -110,18 +105,15 @@ export function AppointmentBooking({ doctorId, onBack, onBookingComplete }: Appo
     
     try {
       // Save appointment to Supabase
-      const appointmentData = await supabase
-        .from('appointments')
-        .insert({
-          patient_id: user.id,
-          doctor_id: doctorId,
-          appointment_date: selectedDate.toISOString().split('T')[0],
-          appointment_time: selectedTime.replace(' ', '').toLowerCase(),
-          status: 'pending',
-          symptoms: symptoms || null,
-          consultation_fee: doctor.consultationFee
-        })
-        .select()
+      const appointmentData = await supabaseHelpers.createAppointment({
+        patient_id: user.id,
+        doctor_id: doctorId,
+        appointment_date: selectedDate.toISOString().split('T')[0],
+        appointment_time: selectedTime.replace(' ', '').toLowerCase(),
+        status: 'pending',
+        symptoms: symptoms || undefined,
+        consultation_fee: doctor.consultationFee
+      })
 
       console.log('Appointment booked successfully:', appointmentData)
       

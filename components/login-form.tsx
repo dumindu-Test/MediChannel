@@ -7,10 +7,14 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { Stethoscope, Loader2 } from 'lucide-react'
+import { Stethoscope, Loader2, UserPlus } from 'lucide-react'
 import { useToast } from '@/hooks/use-toast'
 
-export function LoginForm() {
+interface LoginFormProps {
+  onSwitchToSignup?: () => void
+}
+
+export function LoginForm({ onSwitchToSignup }: LoginFormProps = {}) {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const { login, isLoading } = useAuth()
@@ -131,6 +135,22 @@ export function LoginForm() {
                 </div>
               </TabsContent>
             ))}
+            
+            {/* Signup Link */}
+            <div className="text-center mt-6">
+              <p className="text-sm text-muted-foreground mb-3">
+                Don't have an account?
+              </p>
+              <Button 
+                variant="outline" 
+                className="w-full"
+                onClick={onSwitchToSignup}
+                disabled={isLoading}
+              >
+                <UserPlus className="w-4 h-4 mr-2" />
+                Create New Account
+              </Button>
+            </div>
           </Tabs>
         </CardContent>
       </Card>

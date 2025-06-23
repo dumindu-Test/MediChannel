@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { supabase } from '@/lib/supabase'
+import { supabaseHelpers } from '@/lib/supabase'
 import { useAuth } from '@/lib/auth-context'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
@@ -46,11 +46,7 @@ export function AppointmentHistory() {
     setIsLoading(true)
     
     try {
-      const appointmentsData = await supabase
-        .from('appointments')
-        .select('*')
-        .eq('patient_id', user.id)
-        .data
+      const appointmentsData = await supabaseHelpers.getAppointmentsByPatient(user.id) || []
 
       const appointmentsWithDoctors = appointmentsData.map((apt: any) => ({
         id: apt.id,
