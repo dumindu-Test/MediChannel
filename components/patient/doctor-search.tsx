@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { supabase } from '@/lib/supabase'
+import { supabaseHelpers } from '@/lib/supabase'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
@@ -57,13 +57,9 @@ export function DoctorSearch({ onBookAppointment }: DoctorSearchProps) {
     setIsLoading(true)
     
     try {
-      const doctorsData = await supabase
-        .from('users')
-        .select('*')
-        .eq('role', 'doctor')
-        .data
+      const doctorsData = await supabaseHelpers.getDoctors()
 
-      const doctors: Doctor[] = doctorsData.map((doc: any) => ({
+      const doctors: Doctor[] = (doctorsData || []).map((doc: any) => ({
         id: doc.id,
         name: doc.name,
         specialization: doc.specialization || 'General Medicine',

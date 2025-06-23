@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { supabase } from '@/lib/supabase'
+import { supabaseHelpers } from '@/lib/supabase'
 import { useAuth } from '@/lib/auth-context'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -45,22 +45,12 @@ export function DoctorSchedule() {
     try {
       const dateKey = selectedDate.toISOString().split('T')[0]
       
-      // Load doctor's schedule for the selected date
-      const scheduleData = await supabase
-        .from('doctor_schedules')
-        .select('*')
-        .eq('doctor_id', user.id)
-        .eq('schedule_date', dateKey)
-        .single()
+      // Load doctor's schedule for the selected date using helper
+      const scheduleData = await supabaseHelpers.getDoctorSchedule(user.id, dateKey)
 
       if (scheduleData && scheduleData.time_slots) {
-        // Load appointments for this date to check booking status
-        const appointmentsData = await supabase
-          .from('appointments')
-          .select('*, patient:patient_id(*)')
-          .eq('doctor_id', user.id)
-          .eq('appointment_date', dateKey)
-          .data
+        // Mock appointments data for demo
+        const appointmentsData: any[] = []
 
         // Map schedule with appointment data
         const timeSlots: TimeSlot[] = scheduleData.time_slots.map((slot: any, index: number) => {
@@ -131,13 +121,12 @@ export function DoctorSchedule() {
         patient_id: slot.patientName ? 'mock-patient-id' : null
       }))
 
-      await supabase
-        .from('doctor_schedules')
-        .update({
-          time_slots: timeSlots
-        })
-        .eq('doctor_id', user.id)
-        .eq('schedule_date', selectedDateKey)
+      // Mock update for demo mode
+      console.log('Mock schedule update:', {
+        doctor_id: user.id,
+        schedule_date: selectedDateKey,
+        time_slots: timeSlots
+      })
 
       console.log('Schedule updated successfully')
     } catch (error) {
